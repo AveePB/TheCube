@@ -1,0 +1,3 @@
+﻿  main.cpp
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(13,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+  cube.vcxproj -> C:\Users\mike3\Desktop\TheCube\code\x64\Debug\cube.exe
