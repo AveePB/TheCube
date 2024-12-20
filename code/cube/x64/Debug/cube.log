@@ -1,3 +1,18 @@
 ﻿  main.cpp
-C:\Users\mike3\Desktop\TheCube\code\main.cpp(13,30): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(8,31): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(62,15): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(63,15): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(64,15): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(75,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(75,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(75,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(76,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(76,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(76,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(77,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(77,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(77,43): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(83,14): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(84,14): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\mike3\Desktop\TheCube\code\main.cpp(87,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
   cube.vcxproj -> C:\Users\mike3\Desktop\TheCube\code\x64\Debug\cube.exe

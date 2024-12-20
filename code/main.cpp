@@ -1,92 +1,94 @@
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
+#include <iostream>
 #include <chrono>
 #include <thread>
+#include "geometry.h"
 
-float Xr, Yr, Zr;
+// Constants
+const int SCREEN_WIDTH = 100, SCREEN_HEIGHT = 44;
+const float INCREMENT_SPEED = 0.6;
+const float CUBE_WIDTH = 15;
+const float DEPTH = 60;
+const float SCALE = 30;
 
-float cubeWidth = 20;
-int width = 100, height = 44;
-float zBuffer[160 * 44];
-char buffer[160 * 44];
-int backgroundASCIICode = ' ';
-int distanceFromCam = 60;
-float horizontalOffset;
-float K1 = 40;
+/**
+ * Rotates a 3D point and updates the z-buffer and character buffer for rendering.
+ *
+ * @param Xr Rotation angle around the X-axis (in radians).
+ * @param Yr Rotation angle around the Y-axis (in radians).
+ * @param Zr Rotation angle around the Z-axis (in radians).
+ * @param zBuffer Pointer to the depth buffer (z-buffer) used to handle visibility of surfaces.
+ * @param buffer Pointer to the character buffer representing the rendered image on the screen.
+ * @param cubeX X-coordinate of the 3D point to rotate.
+ * @param cubeY Y-coordinate of the 3D point to rotate.
+ * @param cubeZ Z-coordinate of the 3D point to rotate.
+ * @param ch Character to use for rendering this point in the buffer.
+ */
+void rotateSurfacePoint(const float Xr, const float Yr, const float Zr, float* zBuffer, char* buffer, float cubeX, float cubeY, float cubeZ, char ch);
 
-float incrementSpeed = 0.6;
+int main() {
+    // Cube XYZ rotations & buffer
+    float Xr = 0, Yr = 0, Zr = 0;
+    float zBuffer[160 * 44];
+    char buffer[160 * 44];
 
-float ooz;
-int xp, yp;
-int idx;
+    while (true) {
+        system("cls");
 
-float calculateX(int x, int y, int z) {
-    return y * sin(Xr) * sin(Yr) * cos(Zr) - z * cos(Xr) * sin(Yr) * cos(Zr) +
-        y * cos(Xr) * sin(Zr) + z * sin(Xr) * sin(Zr) + x * cos(Yr) * cos(Zr);
+        // Reset cube buffer
+        memset(buffer, ' ', SCREEN_WIDTH * SCREEN_HEIGHT);
+        memset(zBuffer, 0, SCREEN_WIDTH * SCREEN_HEIGHT * 4);
+
+        // Compute point rotations of each surface
+        for (float cubeX = -CUBE_WIDTH; cubeX < CUBE_WIDTH; cubeX += INCREMENT_SPEED) {
+            for (float cubeY = -CUBE_WIDTH; cubeY < CUBE_WIDTH;
+                cubeY += INCREMENT_SPEED) {
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, cubeX, cubeY, -CUBE_WIDTH, '@');
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, CUBE_WIDTH, cubeY, cubeX, '$');
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, -CUBE_WIDTH, cubeY, -cubeX, '~');
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, -cubeX, cubeY, CUBE_WIDTH, '#');
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, cubeX, -CUBE_WIDTH, -cubeY, ';');
+                rotateSurfacePoint(Xr, Yr, Zr, zBuffer, buffer, cubeX, CUBE_WIDTH, cubeY, '+');
+            }
+        }
+
+        // Display 3D ASCII cube
+        for (int row = 0; row < SCREEN_HEIGHT; row++) {
+            for (int col = 0; col < SCREEN_WIDTH; col++) 
+                std::cout << buffer[row * SCREEN_WIDTH + col];
+            std::cout << '\n';
+        }
+
+        // Afterwards rotate cube
+        Xr += 0.05;
+        Yr += 0.05;
+        Zr += 0.01;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+
+    return 0;
 }
 
-float calculateY(int x, int y, int z) {
-    return y * cos(Xr) * cos(Zr) + z * sin(Xr) * cos(Zr) -
-        y * sin(Xr) * sin(Yr) * sin(Zr) + z * cos(Xr) * sin(Yr) * sin(Zr) -
-        x * cos(Yr) * sin(Zr);
-}
 
-float calculateZ(int x, int y, int z) {
-    return z * cos(Xr) * cos(Yr) - y * sin(Xr) * cos(Yr) + x * sin(Yr);
-}
+void rotateSurfacePoint(const float Xr, const float Yr, const float Zr, float* zBuffer, char* buffer, float cubeX, float cubeY, float cubeZ, char ch) {
+    // Compute rotated x, y, and z coordinates for 3D point.
+    float x = rotations::getX(Xr, Yr, Zr, cubeX, cubeY, cubeZ);
+    float y = rotations::getY(Xr, Yr, Zr, cubeX, cubeY, cubeZ);
+    float z = rotations::getZ(Xr, Yr, Zr, cubeX, cubeY, cubeZ) + DEPTH;
 
-void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
-    float x = calculateX(cubeX, cubeY, cubeZ);
-    float y = calculateY(cubeX, cubeY, cubeZ);
-    float z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
+    // Calculate perspective projection
+    float ooz = 1 / z;
 
-    ooz = 1 / z;
+    // Get x, y screen-space coordinates
+    float xp = (int)(SCREEN_WIDTH / 2 + CUBE_WIDTH + SCALE * ooz * x * 2);
+    float yp = (int)(SCREEN_HEIGHT / 2 + SCALE * ooz * y);
 
-    xp = (int)(width / 2 + horizontalOffset + K1 * ooz * x * 2);
-    yp = (int)(height / 2 + K1 * ooz * y);
-
-    idx = xp + yp * width;
-    if (idx >= 0 && idx < width * height) {
+    // Update buffer and z-buffer if visible
+    int idx = xp + yp * SCREEN_WIDTH;
+    if (idx >= 0 && idx < SCREEN_WIDTH * SCREEN_HEIGHT) {
         if (ooz > zBuffer[idx]) {
             zBuffer[idx] = ooz;
             buffer[idx] = ch;
         }
     }
-}
-
-int main() {
-    system("cls");
-
-    while (1) {
-        memset(buffer, backgroundASCIICode, width * height);
-        memset(zBuffer, 0, width * height * 4);
-
-        cubeWidth = 10;
-        horizontalOffset = 1 * cubeWidth;
-        // second cube
-        for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed) {
-            for (float cubeY = -cubeWidth; cubeY < cubeWidth;
-                cubeY += incrementSpeed) {
-                calculateForSurface(cubeX, cubeY, -cubeWidth, '@');
-                calculateForSurface(cubeWidth, cubeY, cubeX, '$');
-                calculateForSurface(-cubeWidth, cubeY, -cubeX, '~');
-                calculateForSurface(-cubeX, cubeY, cubeWidth, '#');
-                calculateForSurface(cubeX, -cubeWidth, -cubeY, ';');
-                calculateForSurface(cubeX, cubeWidth, cubeY, '+');
-            }
-        }
-
-        system("cls");
-
-        for (int k = 0; k < width * height; k++) {
-            putchar(k % width ? buffer[k] : 10);
-        }
-
-        Xr += 0.05;
-        Yr += 0.05;
-        Zr += 0.01;
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    }
-    return 0;
 }
