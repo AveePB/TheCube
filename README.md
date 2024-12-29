@@ -1,5 +1,9 @@
 # 3D Rotating Cube Rendering Project
 
+<div align="center">
+  <img src="cube.png" alt="Project Image" width="400" >
+</div>
+
 ## Overview
 This project implements a 3D rotating cube rendered using ASCII characters. It uses rotation transformations, depth buffering, and perspective projection to create a dynamic and visually engaging 3D effect within a terminal environment. The program is written in C++ and demonstrates concepts such as matrix transformations, z-buffering, and interactive graphics rendering.
 
