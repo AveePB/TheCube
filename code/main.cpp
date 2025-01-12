@@ -26,6 +26,10 @@ const float SCALE = 30;
 void rotateSurfacePoint(const float Xr, const float Yr, const float Zr, float* zBuffer, char* buffer, float cubeX, float cubeY, float cubeZ, char ch);
 
 int main() {
+    // Remove cout buffer
+    std::ios_base::sync_with_stdio(0);
+    std::cout.tie(0);
+
     // Cube XYZ rotations & buffer
     float Xr = 0, Yr = 0, Zr = 0;
     float zBuffer[160 * 44];
